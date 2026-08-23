@@ -42,7 +42,6 @@ export default function HomeScreen() {
   const [coupleId, setCoupleId] = useState<string | null>(null);
 
   const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
-  // 紀錄全螢幕燈箱關閉後是否需要自動重新打開照片牆 Modal
   const [reopenBatchModal, setReopenBatchModal] = useState(false);
 
   const notify = (title: string, msg: string) => {
@@ -206,21 +205,7 @@ export default function HomeScreen() {
     { id: '2', title: '🎀 第一次約會', url: 'https://picsum.photos/300/400?random=2' },
   ]);
 
-  const [places, setPlaces] = useState<PlaceItem[]>([
-    {
-      id: 1,
-      name: '西門町阿宗麵線',
-      category: 'visited',
-      note: '上次說想吃的麵線，加辣很讚',
-      createdBy: '男生',
-      createdAt: '2024-05-10 14:30',
-      visitDate: '2024-05-10',
-      imageUrl: 'https://picsum.photos/400/250?random=10',
-      lat: 25.0432,
-      lng: 121.5081,
-    },
-  ]);
-
+  const [places, setPlaces] = useState<PlaceItem[]>([]);
   const [posts, setPosts] = useState<PostItem[]>([]);
 
   const calculateDaysTogether = () => {
@@ -559,16 +544,57 @@ export default function HomeScreen() {
       if (error) {
         notify('貼文發布失敗 ❌', error.message);
       } else {
-        notify('成功 ✨', '貼文發布成功！');
+        const currentContent = newPostContent;
         setNewPostContent('');
         setNewPostImages([]);
         await fetchPosts();
+
+        if (uploadedUrls.length > 0) {
+          const askMsg = '貼文發布成功！要順便將這些照片同步加到「照片牆/相簿」嗎？';
+          
+          if (typeof window !== 'undefined' && window.confirm) {
+            if (window.confirm(askMsg)) {
+              await addPostPhotosToAlbum(targetCoupleId, currentContent, uploadedUrls);
+            }
+          } else {
+            Alert.alert('發布成功 ✨', askMsg, [
+              { text: '不用了', style: 'cancel' },
+              {
+                text: '加到相簿 💕',
+                onPress: () => addPostPhotosToAlbum(targetCoupleId, currentContent, uploadedUrls),
+              },
+            ]);
+          }
+        } else {
+          notify('成功 ✨', '貼文發布成功！');
+        }
       }
     } catch (err) {
       console.error('發布貼文異常：', err);
       notify('錯誤 ⚠️', '發布過程中發生異常');
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const addPostPhotosToAlbum = async (cId: string, content: string, urls: string[]) => {
+    try {
+      const titleText = content.trim() || '動態照片 💕';
+      const records = urls.map((url) => ({
+        couple_id: cId,
+        title: titleText,
+        url: url,
+      }));
+
+      const { error } = await supabase.from('album_photos').insert(records);
+      if (error) {
+        notify('同步相簿失敗 ❌', error.message);
+      } else {
+        notify('成功 📸', '照片已同步加到照片牆囉！');
+        await fetchAlbumPhotos();
+      }
+    } catch (e) {
+      console.error('同步相簿異常：', e);
     }
   };
 
@@ -598,7 +624,6 @@ export default function HomeScreen() {
     }
   };
 
-  // 處理點擊圖片放大
   const handleOpenPreview = (url: string, fromBatchModal = false) => {
     if (fromBatchModal) {
       setReopenBatchModal(true);
@@ -607,7 +632,6 @@ export default function HomeScreen() {
     setPreviewImageUrl(url);
   };
 
-  // 關閉全螢幕預覽
   const handleClosePreview = () => {
     setPreviewImageUrl(null);
     if (reopenBatchModal) {
@@ -615,6 +639,38 @@ export default function HomeScreen() {
       setReopenBatchModal(false);
     }
   };
+
+  // 渲染設定區塊 UI：男生專屬區塊
+  const renderMaleSettingSection = () => (
+    <View style={styles.avatarRow}>
+      <TouchableOpacity onPress={() => handlePickAvatar('男方')}>
+        <Image source={{ uri: maleAvatar }} style={styles.settingAvatar} />
+        <Text style={styles.avatarChangeHint}>
+          {currentUser === '男方' ? '更換' : '不可改'}
+        </Text>
+      </TouchableOpacity>
+      <View style={{ flex: 1 }}>
+        <Text style={styles.subLabel}>🐻 男生暱稱：</Text>
+        <TextInput style={styles.modalInput} value={maleName} onChangeText={setMaleName} />
+      </View>
+    </View>
+  );
+
+  // 渲染設定區塊 UI：女生專屬區塊
+  const renderFemaleSettingSection = () => (
+    <View style={styles.avatarRow}>
+      <TouchableOpacity onPress={() => handlePickAvatar('女方')}>
+        <Image source={{ uri: partnerAvatar }} style={styles.settingAvatar} />
+        <Text style={styles.avatarChangeHint}>
+          {currentUser === '女方' ? '更換' : '不可改'}
+        </Text>
+      </TouchableOpacity>
+      <View style={{ flex: 1 }}>
+        <Text style={styles.subLabel}>🐰 女生暱稱：</Text>
+        <TextInput style={styles.modalInput} value={partnerName} onChangeText={setPartnerName} />
+      </View>
+    </View>
+  );
 
   if (!isLoggedIn) {
     return (
@@ -836,7 +892,6 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* 全螢幕照片預覽 Modal */}
       <Modal visible={!!previewImageUrl} transparent animationType="fade">
         <View style={styles.lightboxOverlay}>
           <TouchableOpacity style={styles.lightboxCloseBtn} onPress={handleClosePreview}>
@@ -860,7 +915,6 @@ export default function HomeScreen() {
         />
       )}
 
-      {/* 照片牆管理 Modal */}
       <Modal visible={showBatchModal} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.batchCard}>
@@ -944,7 +998,6 @@ export default function HomeScreen() {
                 </View>
               </View>
             ) : (
-              /* 歷史相簿分頁：修正 Flexbox 佈局以確保關閉按鈕固定在底部 */
               <View style={{ height: 380, justifyContent: 'space-between' }}>
                 <ScrollView 
                   style={{ flex: 1 }} 
@@ -989,6 +1042,7 @@ export default function HomeScreen() {
         </View>
       </Modal>
 
+      {/* 修改處：設定 Modal */}
       <Modal visible={showSettingsModal} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
@@ -1005,31 +1059,18 @@ export default function HomeScreen() {
             <View style={styles.settingItem}>
               <Text style={styles.settingLabel}>🏷️ 個人資料設定：</Text>
 
-              <View style={styles.avatarRow}>
-                <TouchableOpacity onPress={() => handlePickAvatar('男方')}>
-                  <Image source={{ uri: maleAvatar }} style={styles.settingAvatar} />
-                  <Text style={styles.avatarChangeHint}>
-                    {currentUser === '男方' ? '更換' : '不可改'}
-                  </Text>
-                </TouchableOpacity>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.subLabel}>🐻 男生暱稱：</Text>
-                  <TextInput style={styles.modalInput} value={maleName} onChangeText={setMaleName} />
-                </View>
-              </View>
-
-              <View style={styles.avatarRow}>
-                <TouchableOpacity onPress={() => handlePickAvatar('女方')}>
-                  <Image source={{ uri: partnerAvatar }} style={styles.settingAvatar} />
-                  <Text style={styles.avatarChangeHint}>
-                    {currentUser === '女方' ? '更換' : '不可改'}
-                  </Text>
-                </TouchableOpacity>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.subLabel}>🐰 女生暱稱：</Text>
-                  <TextInput style={styles.modalInput} value={partnerName} onChangeText={setPartnerName} />
-                </View>
-              </View>
+              {/* 根據 currentUser 動態調整男生/女生順序：登入者的資訊會在上面 */}
+              {currentUser === '男方' ? (
+                <>
+                  {renderMaleSettingSection()}
+                  {renderFemaleSettingSection()}
+                </>
+              ) : (
+                <>
+                  {renderFemaleSettingSection()}
+                  {renderMaleSettingSection()}
+                </>
+              )}
             </View>
 
             <View style={styles.btnRow}>
