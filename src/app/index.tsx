@@ -1085,12 +1085,10 @@ export default function HomeScreen() {
   );
 }
 
-// 完全還原原始的尺寸、字體大小、高度、內外距與圓角設定
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFFDF9' },
   content: { padding: 16, alignItems: 'center' },
   
-  // 保留三欄佈局，改用比例寬度 (1 : 2.5 : 1)，讓手機到電腦都能完美保持完全一致的版面與等比縮放
   mainLayout: { flexDirection: 'row', width: '100%', maxWidth: 1600, gap: 20, alignItems: 'flex-start' },
   sideColumn: { flex: 1, gap: 16 },
   centerColumn: { flex: 2.5 },
@@ -1240,7 +1238,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: 20,
     height: 20,
-    justify.content: 'center',
+    justifyContent: 'center',
     alignItems: 'center',
   },
   removeImgText: { color: '#FFF', fontSize: 10, fontWeight: 'bold' },
