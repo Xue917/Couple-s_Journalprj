@@ -11,6 +11,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  useWindowDimensions,
   View
 } from 'react-native';
 import { AddPlaceModal } from '../components/AddPlaceModal';
@@ -28,6 +29,9 @@ export interface PostItem {
 }
 
 export default function HomeScreen() {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768; // 小於 768px 時切換為手機單欄模式
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState<UserType>('男方');
   const [loginAccount, setLoginAccount] = useState('');
@@ -709,17 +713,19 @@ export default function HomeScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.mainLayout}>
-        <View style={styles.sideColumn}>
-          {dynamicLeftPhotos.map((photo) => (
-            <TouchableOpacity key={photo.id} activeOpacity={0.9} onPress={() => handleOpenPreview(photo.url)} style={styles.photoCard}>
-              <Image source={{ uri: photo.url }} style={styles.photoImage} />
-              <Text style={styles.photoTitle}>{photo.title}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+      <View style={[styles.mainLayout, isMobile && styles.mainLayoutMobile]}>
+        {!isMobile && (
+          <View style={styles.sideColumn}>
+            {dynamicLeftPhotos.map((photo) => (
+              <TouchableOpacity key={photo.id} activeOpacity={0.9} onPress={() => handleOpenPreview(photo.url)} style={styles.photoCard}>
+                <Image source={{ uri: photo.url }} style={styles.photoImage} />
+                <Text style={styles.photoTitle}>{photo.title}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
 
-        <View style={styles.centerColumn} onLayout={handleCenterLayout}>
+        <View style={[styles.centerColumn, isMobile && styles.centerColumnMobile]} onLayout={handleCenterLayout}>
           <View style={styles.topHeaderCard}>
             <TouchableOpacity style={styles.settingsBtn} onPress={() => setShowSettingsModal(true)}>
               <Text style={styles.settingsBtnText}>⚙️ 設定</Text>
@@ -880,14 +886,30 @@ export default function HomeScreen() {
           )}
         </View>
 
-        <View style={styles.sideColumn}>
-          {dynamicRightPhotos.map((photo) => (
-            <TouchableOpacity key={photo.id} activeOpacity={0.9} onPress={() => handleOpenPreview(photo.url)} style={styles.photoCard}>
-              <Image source={{ uri: photo.url }} style={styles.photoImage} />
-              <Text style={styles.photoTitle}>{photo.title}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        {!isMobile && (
+          <View style={styles.sideColumn}>
+            {dynamicRightPhotos.map((photo) => (
+              <TouchableOpacity key={photo.id} activeOpacity={0.9} onPress={() => handleOpenPreview(photo.url)} style={styles.photoCard}>
+                <Image source={{ uri: photo.url }} style={styles.photoImage} />
+                <Text style={styles.photoTitle}>{photo.title}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        {isMobile && (
+          <View style={styles.mobilePhotoGrid}>
+            <Text style={styles.mobileSectionTitle}>📸 我們的甜蜜照片牆</Text>
+            <View style={styles.mobilePhotoRow}>
+              {[...dynamicLeftPhotos, ...dynamicRightPhotos].map((photo) => (
+                <TouchableOpacity key={photo.id} activeOpacity={0.9} onPress={() => handleOpenPreview(photo.url)} style={styles.mobilePhotoCard}>
+                  <Image source={{ uri: photo.url }} style={styles.mobilePhotoImage} />
+                  <Text style={styles.photoTitle} numberOfLines={1}>{photo.title}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
       </View>
 
       <Modal visible={!!previewImageUrl} transparent animationType="fade">
@@ -1090,8 +1112,10 @@ const styles = StyleSheet.create({
   content: { padding: 16, alignItems: 'center' },
   
   mainLayout: { flexDirection: 'row', width: '100%', maxWidth: 1600, gap: 20, alignItems: 'flex-start' },
+  mainLayoutMobile: { flexDirection: 'column' },
   sideColumn: { flex: 1, gap: 16 },
   centerColumn: { flex: 2.5 },
+  centerColumnMobile: { width: '100%' },
 
   photoCard: {
     backgroundColor: '#FFF',
@@ -1106,6 +1130,20 @@ const styles = StyleSheet.create({
   },
   photoImage: { width: '100%', height: 220, borderRadius: 16 },
   photoTitle: { marginTop: 8, fontSize: 13, fontWeight: '700', color: '#7C6A58' },
+
+  mobilePhotoGrid: { width: '100%', marginTop: 20 },
+  mobileSectionTitle: { fontSize: 16, fontWeight: '800', color: '#7C6A58', marginBottom: 12, textAlign: 'center' },
+  mobilePhotoRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, justifyContent: 'space-between' },
+  mobilePhotoCard: {
+    width: '48%',
+    backgroundColor: '#FFF',
+    borderRadius: 16,
+    padding: 8,
+    borderWidth: 1.5,
+    borderColor: '#FFF3E4',
+    alignItems: 'center',
+  },
+  mobilePhotoImage: { width: '100%', height: 140, borderRadius: 12 },
 
   topHeaderCard: {
     flexDirection: 'row',
