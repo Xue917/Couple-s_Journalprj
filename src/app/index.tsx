@@ -289,7 +289,7 @@ export default function HomeScreen() {
 
       if (error) {
         if (error.message.includes('rate limit')) {
-          return notify('請稍後再試 ⏳', '請求太頻繁，請等待約 10~15 分鐘冷確後再試！');
+          return notify('請稍後再試 ⏳', '請求太頻繁，請等待約 10~15 分鐘冷卻後再試！');
         }
         return notify('登入失敗 ❌', '帳號或密碼錯誤，請確認後重試！');
       }
@@ -1087,10 +1087,29 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFFDF9' },
-  content: { padding: 16, alignItems: 'center' },
-  mainLayout: { flexDirection: 'row', width: '100%', maxWidth: 1600, gap: 20, alignItems: 'flex-start' },
-  sideColumn: { flex: 1, minWidth: 220, gap: 16 },
-  centerColumn: { flex: 2.5, minWidth: 500 },
+  content: { padding: 12, alignItems: 'center', width: '100%' },
+  
+  mainLayout: { 
+    flexDirection: 'row', 
+    flexWrap: 'wrap',
+    width: '100%', 
+    maxWidth: 1200, 
+    gap: 16, 
+    justifyContent: 'center',
+    alignItems: 'flex-start' 
+  },
+  
+  sideColumn: { 
+    width: '100%', 
+    maxWidth: 280, 
+    gap: 16,
+    flexGrow: 1,
+  },
+  centerColumn: { 
+    width: '100%', 
+    maxWidth: 600, 
+    flexGrow: 1,
+  },
 
   photoCard: {
     backgroundColor: '#FFF',
@@ -1120,6 +1139,7 @@ const styles = StyleSheet.create({
     shadowColor: '#F2D3C1',
     shadowOpacity: 0.2,
     shadowRadius: 12,
+    width: '100%',
   },
 
   settingsBtn: {
@@ -1129,26 +1149,26 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   settingsBtnText: { fontSize: 13, fontWeight: '800', color: '#8A6D53' },
-  roleGroup: { flexDirection: 'row', gap: 10, alignItems: 'center' },
+  roleGroup: { flexDirection: 'row', gap: 6, alignItems: 'center', flexWrap: 'wrap' },
   roleChip: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     borderRadius: 20,
   },
   headerAvatar: { width: 24, height: 24, borderRadius: 12, marginRight: 6 },
   activeMale: { backgroundColor: '#70A1FF' },
   activeFemale: { backgroundColor: '#FF788E' },
   inactiveChip: { backgroundColor: '#FFF5EB' },
-  roleText: { fontSize: 13, fontWeight: '800', color: '#7C6A58' },
+  roleText: { fontSize: 12, fontWeight: '800', color: '#7C6A58' },
   whiteText: { color: '#FFFFFF' },
 
   anniversaryCard: {
     backgroundColor: '#FFF0F3',
     borderRadius: 24,
     paddingVertical: 14,
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
@@ -1157,14 +1177,15 @@ const styles = StyleSheet.create({
     shadowColor: '#FFB3C1',
     shadowOpacity: 0.2,
     shadowRadius: 8,
+    width: '100%',
   },
-  anniversaryText: { fontSize: 16, fontWeight: '800', color: '#803043' },
-  daysText: { fontSize: 32, fontWeight: '900', color: '#FF2A55', letterSpacing: 1 },
+  anniversaryText: { fontSize: 14, fontWeight: '800', color: '#803043', textAlign: 'center' },
+  daysText: { fontSize: 28, fontWeight: '900', color: '#FF2A55', letterSpacing: 1 },
 
   batchBtn: {
     backgroundColor: '#FFF0F3',
     paddingVertical: 14,
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     borderRadius: 20,
     alignItems: 'center',
     marginBottom: 16,
@@ -1175,12 +1196,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 8,
     elevation: 3,
+    width: '100%',
   },
   batchBtnText: {
     color: '#FF4D6D',
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '900',
     letterSpacing: 0.5,
+    textAlign: 'center',
   },
 
   filterRow: {
@@ -1189,6 +1212,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     justifyContent: 'flex-start',
     alignItems: 'center',
+    flexWrap: 'wrap',
   },
   filterChip: {
     flexDirection: 'row',
@@ -1214,6 +1238,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 2,
     borderColor: '#FFE8D6',
+    width: '100%',
   },
   composerInput: {
     backgroundColor: '#FFFDF9',
@@ -1257,6 +1282,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 2,
     borderColor: '#FFE8D6',
+    width: '100%',
   },
   igHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   igAvatar: { width: 36, height: 36, borderRadius: 18, marginRight: 10 },
@@ -1274,7 +1300,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: '#FAF0E6',
   },
-  igPostImage: { width: 360, height: 260 },
+  igPostImage: { width: 300, height: 220 },
   imageBadge: {
     position: 'absolute',
     top: 10,
@@ -1308,7 +1334,7 @@ const styles = StyleSheet.create({
   lightboxCloseText: { color: '#FFF', fontSize: 14, fontWeight: 'bold' },
 
   modalOverlay: { flex: 1, backgroundColor: 'rgba(90, 70, 60, 0.4)', justifyContent: 'center', alignItems: 'center' },
-  modalCard: { width: 360, backgroundColor: '#FFFDF9', borderRadius: 28, padding: 24, borderWidth: 3, borderColor: '#FFE8D6' },
+  modalCard: { width: '90%', maxWidth: 360, backgroundColor: '#FFFDF9', borderRadius: 28, padding: 20, borderWidth: 3, borderColor: '#FFE8D6' },
 
   modalHeader: {
     position: 'relative',
@@ -1353,7 +1379,7 @@ const styles = StyleSheet.create({
   logoutBtn: { flex: 1, backgroundColor: '#FFF3E4', paddingVertical: 10, borderRadius: 18, alignItems: 'center', borderWidth: 1, borderColor: '#FFD8BE' },
   logoutBtnText: { color: '#A0836B', fontSize: 13, fontWeight: '800' },
 
-  batchCard: { width: '90%', maxWidth: 450, backgroundColor: '#FFFDF9', borderRadius: 28, padding: 24, borderWidth: 3, borderColor: '#FFE8D6' },
+  batchCard: { width: '92%', maxWidth: 450, backgroundColor: '#FFFDF9', borderRadius: 28, padding: 20, borderWidth: 3, borderColor: '#FFE8D6' },
   tabContainer: { flexDirection: 'row', backgroundColor: '#FFF3E4', borderRadius: 16, padding: 4, marginBottom: 16 },
   tabBtn: { flex: 1, paddingVertical: 8, alignItems: 'center', borderRadius: 12 },
   tabBtnActive: { backgroundColor: '#FF788E' },
@@ -1378,17 +1404,17 @@ const styles = StyleSheet.create({
   historyGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: 10,
     justifyContent: 'flex-start',
     paddingVertical: 8,
     paddingHorizontal: 4,
   },
   historyItem: {
-    width: '30%',
+    width: '31%',
     position: 'relative',
     backgroundColor: '#FFF',
     borderRadius: 12,
-    padding: 6,
+    padding: 4,
     borderWidth: 1,
     borderColor: '#FFE8D6',
   },
@@ -1397,7 +1423,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     overflow: 'hidden',
   },
-  historyImage: { width: '100%', height: 80 },
+  historyImage: { width: '100%', height: 70 },
   historyTitle: { fontSize: 10, color: '#7C6A58', fontWeight: '700', marginTop: 4, textAlign: 'center' },
   historyDeleteBtn: {
     position: 'absolute',
@@ -1412,8 +1438,8 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
 
-  loginContainer: { flex: 1, backgroundColor: '#FFFDF9', justifyContent: 'center', alignItems: 'center', padding: 20 },
-  loginCard: { width: '100%', maxWidth: 360, backgroundColor: '#FFFFFF', borderRadius: 28, padding: 28, borderWidth: 3, borderColor: '#FFE8D6', shadowColor: '#F2D3C1', shadowOpacity: 0.3, shadowRadius: 16 },
+  loginContainer: { flex: 1, backgroundColor: '#FFFDF9', justifyContent: 'center', alignItems: 'center', padding: 16 },
+  loginCard: { width: '100%', maxWidth: 360, backgroundColor: '#FFFFFF', borderRadius: 28, padding: 24, borderWidth: 3, borderColor: '#FFE8D6', shadowColor: '#F2D3C1', shadowOpacity: 0.3, shadowRadius: 16 },
   loginTitle: { fontSize: 22, fontWeight: '900', color: '#7C6A58', textAlign: 'center', marginBottom: 6 },
   loginSubtitle: { fontSize: 13, fontWeight: '600', color: '#A0836B', textAlign: 'center', marginBottom: 24 },
   loginInputGroup: { marginBottom: 16 },
