@@ -1,5 +1,4 @@
 import * as ImagePicker from 'expo-image-picker';
-import Head from 'expo-router/head';
 import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -674,10 +673,6 @@ export default function HomeScreen() {
   if (!isLoggedIn) {
     return (
       <View style={styles.loginContainer}>
-        <Head>
-          <title>0917❤️1224</title>
-          <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Ctext%20y='.9em'%20font-size='90'%3E❤️%3C/text%3E%3C/svg%3E" />
-        </Head>
         <View style={styles.loginCard}>
           <Text style={styles.loginTitle}>🏠 我們的浪漫小屋</Text>
           <Text style={styles.loginSubtitle}>請登入帳號以進入專屬空間 💕</Text>
@@ -714,10 +709,6 @@ export default function HomeScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Head>
-        <title>0917❤️1224</title>
-        <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Ctext%20y='.9em'%20font-size='90'%3E❤️%3C/text%3E%3C/svg%3E" />
-      </Head>
       <View style={styles.mainLayout}>
         <View style={styles.sideColumn}>
           {dynamicLeftPhotos.map((photo) => (
