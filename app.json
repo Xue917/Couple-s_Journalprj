@@ -7,6 +7,11 @@
     "icon": "./assets/images/icon.png",
     "scheme": "couplesjournalprj",
     "userInterfaceStyle": "automatic",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "ios": {
       "icon": "./assets/expo.icon"
     },
@@ -20,6 +25,7 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
+      "bundler": "metro",
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
